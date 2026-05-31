@@ -17,16 +17,19 @@ export default function Detect() {
     const blobResponse = await fetch(dataURL);
     const blob = await blobResponse.blob();
 
-    const jsonResponse = await fetch(
-      "https://backend.happiness-finder.com/api/detect",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": blob.type,
-        },
-        body: blob,
-      }
-    );
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    if (!backendUrl) {
+      console.error("NEXT_PUBLIC_BACKEND_URL is not set");
+      return;
+    }
+
+    const jsonResponse = await fetch(`${backendUrl}/api/detect`, {
+      method: "POST",
+      headers: {
+        "Content-Type": blob.type,
+      },
+      body: blob,
+    });
     const data: BoundingBox[] = await jsonResponse.json();
 
     setRectangles(
